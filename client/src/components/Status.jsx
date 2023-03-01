@@ -1,19 +1,28 @@
 import * as React from "react";
-import "../styles/signup.css";
+import "../styles/status.css";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
-import TextField from "@mui/material/TextField";
-import { useNavigate } from "react-router-dom";
-import { GoogleLogin } from "@react-oauth/google";
-import Link from "@mui/material/Link";
+import { Form, useNavigate } from "react-router-dom";
+import Paper from "@mui/material/Paper";
+import { styled } from "@mui/material/styles";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import Box from "@mui/material/Box";
 import axios from "axios";
 import Typography from "@mui/material/Typography";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Radio from "@mui/material/Radio";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import jwt_decode from "jwt-decode";
+import { FormControl, RadioGroup } from "@mui/material";
+
+const Item = styled(Paper)(({ theme }) => ({
+  backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
+  ...theme.typography.body2,
+  padding: theme.spacing(15),
+  textAlign: "center",
+  color: theme.palette.text.secondary,
+}));
 
 const theme = createTheme({
   typography: {
@@ -34,20 +43,6 @@ const theme = createTheme({
 
 export default function SignIn() {
   const navigate = useNavigate();
-
-  const responseMessage = (res) => {
-    sessionStorage.clear();
-    sessionStorage.setItem("googleinfo", res.credential);
-
-    navigate("/main");
-
-    const user = jwt_decode(sessionStorage.getItem("googleinfo"));
-    console.log(user);
-  };
-
-  const errorMessage = (err) => {
-    console.log(err);
-  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -70,11 +65,16 @@ export default function SignIn() {
       });
   };
 
+  const handleChange = (event) => {
+    console.log(event.target.value);
+    navigate('/main')
+  }
+
   return (
     <ThemeProvider theme={theme}>
-      <Container component="main" maxWidth="xs">
+      <Container component="main" maxWidth="md">
         <div className="box-shadow">
-          <Card className="center">
+          <Card className="statuscard">
             <CssBaseline />
             <Box
               sx={{
@@ -84,60 +84,47 @@ export default function SignIn() {
                 alignItems: "center",
               }}
             >
-              <Typography component="h1" variant="h5">
-                Welcome Back!
-              </Typography>
               <Box
                 component="form"
                 onSubmit={handleSubmit}
                 noValidate
                 sx={{ mt: 1 }}
               >
-                <TextField
-                  margin="normal"
-                  required
-                  fullWidth
-                  id="email"
-                  label="Email Address"
-                  name="email"
-                  autoComplete="email"
-                  autoFocus
-                />
-                <TextField
-                  margin="normal"
-                  required
-                  fullWidth
-                  name="password"
-                  label="Password"
-                  type="password"
-                  id="password"
-                  autoComplete="current-password"
-                />
+                <Typography component="h1" variant="h5">
+                  Would you like to continue as a Customer or Vendor?
+                </Typography>
+                <br />
+                <br />
+                <Grid className="test" container spacing={2}>
+                  <FormControl>
+                    <RadioGroup
+                      aria-labelledby="demo-radio-buttons-group-label"
+                      defaultValue="Customer"
+                      name="radio-buttons-group"
+                      onChange={handleChange}
+                    >
+                      <FormControlLabel
+                        value="customer"
+                        control={<Radio />}
+                        label="Customer"
+                      />
+                      <FormControlLabel
+                        value="vendor"
+                        control={<Radio />}
+                        label="Vendor"
+                      />
+                    </RadioGroup>
+                  </FormControl>
+                </Grid>
                 <Button
                   type="submit"
                   fullWidth
                   variant="contained"
                   sx={{ mt: 3, mb: 2 }}
                 >
-                  Sign In
+                  Continue
                 </Button>
-                <GoogleLogin
-                  onSuccess={responseMessage}
-                  onError={errorMessage}
-                />
                 <br />
-                <Grid container>
-                  <Grid item xs>
-                    <Link href="#" variant="body2">
-                      Forgot password?
-                    </Link>
-                  </Grid>
-                  <Grid item>
-                    <Link href="/signup" variant="body2">
-                      {"Don't have an account? Sign Up"}
-                    </Link>
-                  </Grid>
-                </Grid>
               </Box>
             </Box>
           </Card>

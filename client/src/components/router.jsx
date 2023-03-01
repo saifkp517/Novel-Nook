@@ -4,6 +4,8 @@ import { Routes, Route } from 'react-router-dom';
 import Login from '../pages/Login';
 import Home from '../pages/Home'
 import Dash from '../pages/Blog'
+import SignUp from '../pages/SignUp';
+import Profile from '../pages/Profile'
 
 const Main = () => {
   return (
@@ -11,6 +13,8 @@ const Main = () => {
       <Route path='/' element={<Login/>} />
       <Route path='/home' element={<Home/>} />
       <Route path='/main' element={<Dash/>} />
+      <Route path='/signup' element={<SignUp/>} />
+      <Route path='/profile' element={<Profile/>} />
     </Routes>
   );
 }

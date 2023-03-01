@@ -1,0 +1,14 @@
+.book-image {
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+}
+
+.footer {
+    border: 1px solid red;
+}
+
+.description {
+    color: darkslategrey;
+    font-weight: 700;
+}

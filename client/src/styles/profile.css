@@ -1,0 +1,17 @@
+.redline {
+    border: 1px solid red;
+}
+
+.button {
+    margin: 5% 0% 2% 85%;
+}
+
+.profile-pic {
+    margin: auto;
+    
+}
+
+.profile {
+    display: inline-block;
+    padding: 0% 10%;
+}

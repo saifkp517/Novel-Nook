@@ -6,13 +6,22 @@
     text-align: center;
     min-height: 10vh;
     padding: 5%;
-    border: 3px solid burlywood;
-    background-image: url('../../public/login-wall.jpg');
-    background-position: center;
-    margin-top: 50%;
+    border: 3px solid aliceblue;
+    margin-top: 40%;
 }
 
 .box-shadow {
     box-shadow: 10px 10px 10px;
     border-radius: 1%;
+}
+
+.signupcard {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    align-items: center;
+    text-align: center;
+    padding: 0% 5% 5% 5%;
+    border: 5px solid cadetblue;
+    margin-top: 20%;
 }

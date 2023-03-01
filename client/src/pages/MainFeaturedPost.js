@@ -16,6 +16,7 @@ function MainFeaturedPost(props) {
         backgroundColor: 'grey.800',
         color: '#fff',
         mb: 4,
+        height: 350,
         backgroundSize: 'cover',
         backgroundRepeat: 'no-repeat',
         backgroundPosition: 'center',

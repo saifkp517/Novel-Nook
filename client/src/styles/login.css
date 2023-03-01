@@ -1,5 +1,6 @@
 .back-img {
     background-image: url('../../public/background-login.jpg');
+    background-position: center;
     border: 1px solid;
     height: 100vh;
 }
