@@ -5,11 +5,14 @@ const Books = new Schema({
     title: String,
     author: String,
     user: {type: Schema.Types.ObjectId, ref: "User"},
-    image: {
-        data: Buffer,
-        contentType: String
-    },
-    reviews: [{type: Schema.Types.ObjectId, ref: "Reviews"}]
+    bookimage: String,
+    reviews: [{type: Schema.Types.ObjectId, ref: "Reviews"}],
+    pricing: String,
+    genre: String,
+    rating: Number,
+    rentedby: {type: Schema.Types.ObjectId},
+    description: String,
+    time: Date
     // date: {type: Date},
     // meta: {
     //     upvotes: Number,
@@ -17,4 +20,4 @@ const Books = new Schema({
     // }
 })
 
-module.exports = mongoose.model('Book', Books)
+module.exports = mongoose.model('Books', Books)

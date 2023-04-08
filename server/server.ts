@@ -11,19 +11,23 @@ const app = express();
 
 const uri = "mongodb://127.0.0.1:27017";
 
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true,
+}))
+
 mongoose.set('strictQuery', false)
 
-// mongoose.connect(uri)
-// .then(() => {
-//   console.log("Connected to the database!");
-// })
-// .catch(err => console.log(err));
+mongoose.connect(uri)
+.then(() => {
+  console.log("Connected to the database!");
+})
+.catch(err => console.log(err));
 
 const conn = mongoose.createConnection(uri)
 
 let gfs: any;
 conn.once("open", () => {
-  console.log("Connected to the database!")
 
   gfs = new mongoose.mongo.GridFSBucket(conn.db, {
     bucketName: "uploads"
@@ -51,11 +55,11 @@ const storage = new GridFsStorage({
 
 const upload = multer({ storage });
 
-app.post('/upload', upload.single("file"), (req, res) => {
-    res.send("uploaded");
-})
+const Controller = require("./controller/user");
 
-app.get('/upload/:filename', (req, res) => {
+app.post('/book', upload.single("file"), Controller.createBooks);
+
+app.get('/book/:filename', (req, res) => {
     const file = gfs
     .find({
       filename: req.params.filename
@@ -76,8 +80,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: true
 }))
-
-app.use(cors());
 
 app.use(authRoutes);
 

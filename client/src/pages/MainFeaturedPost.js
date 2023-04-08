@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
-import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
 
 function MainFeaturedPost(props) {
@@ -16,7 +15,7 @@ function MainFeaturedPost(props) {
         backgroundColor: 'grey.800',
         color: '#fff',
         mb: 4,
-        height: 350,
+        height: 400,
         backgroundSize: 'cover',
         backgroundRepeat: 'no-repeat',
         backgroundPosition: 'center',
@@ -47,12 +46,9 @@ function MainFeaturedPost(props) {
             <Typography component="h1" variant="h3" color="inherit" gutterBottom>
               {post.title}
             </Typography>
-            <Typography variant="h5" color="inherit" paragraph>
+            <Typography variant="p" color="inherit" paragraph>
               {post.description}
             </Typography>
-            <Link variant="subtitle1" href="#">
-              {post.linkText}
-            </Link>
           </Box>
         </Grid>
       </Grid>
@@ -65,7 +61,6 @@ MainFeaturedPost.propTypes = {
     description: PropTypes.string.isRequired,
     image: PropTypes.string.isRequired,
     imageText: PropTypes.string.isRequired,
-    linkText: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
   }).isRequired,
 };

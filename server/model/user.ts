@@ -6,6 +6,7 @@ const User = new Schema({
     adminstatus: Boolean,
     userstatus: String,
     email: String,
+    balance: String,
     password: String,
     address: String,
     phoneno: String,
@@ -13,7 +14,8 @@ const User = new Schema({
         type: Date,
         default: Date.now
     },
-    books: [{type: Schema.Types.ObjectId, ref: "Books"}],
+    booksforrent: [{type: Schema.Types.ObjectId, ref: "Book"}],
+    booksowned: [{type: Schema.Types.ObjectId, ref: "Book"}],
     reviews: [{type: Schema.Types.ObjectId, ref: "Reviews"}]
 })
 

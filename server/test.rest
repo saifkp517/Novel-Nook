@@ -18,7 +18,9 @@ Content-Type: application/json
 {
     "title": "Ptolemy's Gate",
     "author": "Jonathan Stroud",
-    "userid": "63f1c023c145126e624f6a70"
+    "userid": "63f1c023c145126e624f6a70",
+    "file": "asd",
+    "pricing": 12
 }
 
 ###
@@ -33,4 +35,123 @@ Content-Type: application/json
 {
     "email": "Saifullah",
     "password": "pass123"
+}
+
+###
+
+GET http://localhost:4000/bookid/63ff5c5aa655b51301652f3d
+
+###
+
+POST http://localhost:4000/review
+Content-Type: application/json
+
+{
+    "user": "Saifullah Khan",
+    "book": "6409eaee7c049fdcfbc6feac",
+    "rating": "4.3",
+    "comment": "i bought it cuz the cover looked cool!"
+} 
+
+###
+
+GET http://localhost:4000/bookreview/6409eaee7c049fdcfbc6feac
+
+###
+
+POST http://localhost:4000/user/demote
+Content-Type: application/json
+
+{
+    "id": "6414308eda3d96b7bff50e3a"
+}
+
+###
+
+POST http://localhost:4000/rentedupdate
+Content-Type: application/json
+
+{
+    "rentedby": "6409eac97c049fdcfbc6fea6",
+    "bookid": "6414641cc9b3aedc254c1b7c"
+}
+
+###
+
+POST http://localhost:4000/release
+Content-Type: application/json
+
+{
+    "bookid": "64168dfc1cc4581a81ae0c86"
+}
+
+###
+
+GET http://localhost:4000/user/6409eac97c049fdcfbc6fea6
+
+###
+
+POST http://localhost:4000/notification
+Content-Type: application/json
+
+{
+    "user": "6414308eda3d96b7bff50e3a",
+    "message": "this is a test notification 2"
+}
+
+###
+
+GET http://localhost:4000/notification/6414308eda3d96b7bff50e3a
+
+###
+
+POST http://localhost:4000/notifdel
+Content-Type: application/json
+
+{
+    "notifid": "641697761cda1ce1a0e3b965"
+}
+
+###
+
+GET http://localhost:4000/bookowned/6414308eda3d96b7bff50e3a
+
+###
+
+POST http://localhost:4000/payment
+Content-Type: application/json
+
+{
+    "amount": "123",
+    "user": "6414308eda3d96b7bff50e3a",
+    "paidby": "6416a61c4996436b7113954e",
+    "type": "increment"
+}
+
+###
+GET http://localhost:4000/payment
+
+###
+
+GET http://localhost:4000/getcart/6416a61c4996436b7113954e
+
+###
+
+POST http://localhost:4000/checkitem/64198015cc476a7fe14cc952
+Content-Type: application/json
+
+{
+    "bookid": "641689a01cc4581a81ae0c45"
+}
+
+###
+
+POST http://localhost:4000/delivery
+Content-Type: application/json
+
+{
+    "userid": "6416a61c4996436b7113954e",
+    "shipdate": "test",
+    "shippingaddress": "test",
+    "orderstatus": "orderstatus"
 }

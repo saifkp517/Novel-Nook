@@ -2,8 +2,9 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const Review = new Schema({
-    user: {type: Schema.Types.ObjectId, ref: "User"},
+    user: String,
     book: {type: Schema.Types.ObjectId, ref: "Book"},
+    profileimg: String,
     rating: Number,
     comment: String,
     review_date: {

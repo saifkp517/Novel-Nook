@@ -1,16 +1,19 @@
 import express from "express";
-import mongoose from "mongoose";
-import multer from "multer";
-import { GridFsStorage } from "multer-gridfs-storage";
-import Grid from "gridfs-stream";
-import fs from "fs";
+import Razorpay from "razorpay";
+import crypto from "crypto";
 
 const User = require("../model/user");
+require("dotenv").config();
 const Books = require("../model/books");
-const Reviews =require("../model/reviews");
+const Reviews = require("../model/reviews");
+const Notification = require("../model/notifications");
+const Order = require("../model/orders");
+const CartItem = require("../model/cart");
 
-exports.getUsers = async (req: Request, res: Response) => {
-  User.find().then((data: any) => console.log(data));
+//////////////////////users////////////////////////////////////
+
+exports.getUsers = async (req: express.Request, res: express.Response) => {
+  User.find().then((data: any) => res.send(data));
 };
 
 exports.LoginUser = async (req: express.Request, res: express.Response) => {
@@ -60,17 +63,31 @@ exports.createUser = async (req: express.Request, res: express.Response) => {
   }
 };
 
+exports.getUserById = async (req: express.Request, res: express.Response) => {
+  const id = req.params.userid;
+
+  User.findById({ _id: id })
+    .then((data: any) => res.send(data))
+    .catch((err: Error) => console.log(err));
+};
+
+////////////////////////////books//////////////////////////////////
 
 exports.createBooks = async (req: express.Request, res: express.Response) => {
-
-  const { title, author, userid } = req.body;
+  const { title, pricing, genre, author, userid, description } = req.body;
 
   try {
-    const book = new Books({
+    const book = new Books({  
       title: title,
       author: author,
       user: userid,
-      image: "None",
+      genre: genre,
+      available: true,
+      rentedby: null,
+      rating: 0,
+      pricing: pricing,
+      bookimage: `http://localhost:4000/book/${req.file.filename}`,
+      description: description,
     });
     book
       .save()
@@ -83,30 +100,340 @@ exports.createBooks = async (req: express.Request, res: express.Response) => {
   }
 };
 
-exports.createReview =async(req: express.Request, res: express.Response) => {
+exports.getBooks = async (req: express.Request, res: express.Response) => {
+  Books.find().then((data: any) => res.send(data));
+};
 
-  const {userid, bookid, rating, comment} = req.body;
+exports.PopulateBooks = async (req: express.Request, res: express.Response) => {
+  const userid = req.params.userid;
+
+  Books.find({ user: userid }).then((data: any) => res.send(data));
+};
+
+exports.getBook = async (req: express.Request, res: express.Response) => {
+  Books.findById(req.params.bookid)
+    .then((data: any) => res.send(data))
+    .catch((err: Error) => console.log(err));
+};
+
+/////////////////////////reviews////////////////////////////////////////
+
+exports.createReview = async (req: express.Request, res: express.Response) => {
+  const { user, book, rating, comment } = req.body;
 
   try {
-
     const review = new Reviews({
-      user: userid,
-      book: bookid,
+      user: user,
+      book: book,
+      profileimg: "",
       rating: rating,
       comment: comment,
-    })
-    review.save()
-    .then((data: any) => {
-      res.send("Successfully added a review");
-    })
-    .catch((err: Error) => console.log("error: " + err))
-
+    });
+    review
+      .save()
+      .then((data: any) => {
+        res.send("Successfully added a review");
+      })
+      .catch((err: Error) => console.log("error: " + err));
   } catch (err) {
-    res.status(404).send("Fuck off")
+    res.status(404).send("Fuck off");
   }
+};
+
+exports.populateReviewsByBook = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  Reviews.find({ book: req.params.bookid }).then((data: any) => {
+    res.send(data);
+  });
+};
+
+////////////////////adminfunctions///////////////////////////////
+
+exports.Promote = async (req: express.Request, res: express.Response) => {
+  const id = req.body.id;
+
+  User.updateOne({ _id: id }, { adminstatus: true }).then((data: any) =>
+    res.send("successfully Promoted to Admin!")
+  );
+};
+
+exports.Demote = async (req: express.Request, res: express.Response) => {
+  const id = req.body.id;
+
+  User.updateOne({ _id: id }, { adminstatus: false }).then((data: any) =>
+    res.send("Demoted to User")
+  );
+};
+
+///////////////////////////bookrental///////////////////////////////
+
+exports.rentedByUpdate = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  const { rentedby, bookid, months } = req.body;
+
+  function AddMonths(date: Date, months: number) {
+    date.setMonth(date.getMonth() + months);
+    return date;
+  }  
+
+  Books.findOneAndUpdate({ _id: bookid }, { rentedby: rentedby, time: AddMonths(new Date(), months) }).then(
+    (data: any) => {
+      console.log(data);
+      res.send("Successfully rented book");
+    }
+  );
+};
+
+exports.releaseBook = async (req: express.Request, res: express.Response) => {
+  const { bookid } = req.body;
+
+  Books.findOneAndUpdate({ _id: bookid }, { rentedby: null, time: null })
+    .then((data: any) => {
+      console.log(data);
+    })
+    .catch((err: Error) => console.log(err));
+};
+
+////////////////////notification///////////////////////////
+
+exports.createNotification = async (
+  req: express.Request,
+  res: express.Request
+) => {
+  const { user, message } = req.body;
+
+  const notification = new Notification({
+    user: user,
+    message: message,
+  });
+  notification
+    .save()
+    .then((data: any) => {
+      console.log(data);
+    })
+    .catch((err: Error) => console.log(err));
+};
+
+exports.getNotifications = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  const userid = req.params.userid;
+
+  Notification.find({ user: userid })
+    .then((data: any) => res.send(data))
+    .catch((err: Error) => console.log(err));
+};
+
+exports.deleteNotification = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  const { notifid } = req.body;
+
+  Notification.findByIdAndDelete(notifid)
+    .then((data: any) => {
+      console.log(data);
+      res.send("Successfully deleted notification");
+    })
+    .catch((err: Error) => console.log(err));
+};
+
+/////////////////////////transactions///////////////////////////
+
+
+
+exports.verifySuccess = async (req: express.Request, res: express.Response) => {
+  try {
+    const {
+      orderCreationId,
+      razorpayPaymentId,
+      razorpayOrderId,
+      razorpaySignature,
+    } = req.body;
+
+    const shasum = crypto.createHmac("sha256", process.env.key_secret);
+
+    shasum.update(`${orderCreationId}|${razorpayPaymentId}`);
+
+    const digest = shasum.digest("hex");
+
+    if (digest !== razorpaySignature) {
+      return res.status(400).json({ msg: "Transaction is illicit my dude!" });
+    }
+
+    res.json({
+      msg: "success",
+      orderId: razorpayOrderId,
+      paymentId: razorpayPaymentId,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+exports.Orders = async (req: express.Request, res: express.Response) => {
+  try {
+    const instance = new Razorpay({
+      key_id: process.env.key_id,
+      key_secret: process.env.key_secret,
+    });
+
+    const amount = parseInt(req.params.value);
+
+    const options = {
+      amount: amount * 100,
+      currency: "INR",
+      receipt: "receipt_order 1232",
+    };
+
+    const order = await instance.orders.create(options);
+
+    if (!order) return res.status(500).send("some error has ocurred");
+
+    res.json(order);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+
+////////////////////////////////orders////////////////////////////////////
+
+exports.createOrder = async (req: express.Request, res: express.Response) => {
+  const { customerid, shippingaddress, orderstatus, book } = req.body;
+
+  const order = new Order({
+    customerid: customerid,
+    shipdate: "",
+    shippingaddress: shippingaddress,
+    orderstatus: "ConfirmedOrder",
+    book: book,
+  });
+
+  order
+    .save()
+    .then((data: any) => res.send(data))
+    .catch((err: Error) => console.log(err));
+};
+
+exports.getOrderById = async (req: express.Request, res: express.Response) => {
+
+  Order.findById(req.params.orderid)
+    .then((data: any) => res.send(data))
+    .catch((err: Error) => {
+      console.log(err);
+      res.send("Invalid Order Id");
+    });
+
 
 }
 
-exports.getBooks = async (req: Request, res: Response) => {
-  Books.find().then((data: any) => console.log(data));
+exports.updateOrder = async (req: express.Request, res: express.Response) => {
+  const { orderid, parameter, updatedvalue } = req.body;
+
+  if (parameter === "orderstatus") {
+    Order.updateOne({ _id: orderid }, { orderstatus: updatedvalue })
+    .then((data: any) => res.send("successfully updated"))
+    .catch((err: Error) => console.log(err))
+  } else if (parameter === "shippingaddress") {
+    Order.updateOne({ _id: orderid }, { shippingaddress: updatedvalue })
+    .then((data: any) => res.send("successfully updated"))
+    .catch((err: Error) => console.log(err))
+  } else if (parameter === "shipdate") {
+    Order.updateOne({ _id: orderid }, { parameter: updatedvalue })
+    .then((data: any) => res.send("successfully updated"))
+    .catch((err: Error) => console.log(err))
+  }
 };
+
+exports.addToCart = async (req: express.Request, res: express.Response) => {
+
+  const {book, months, booktitle, price, user, bookimg} = req.body;
+
+  const cartItem = new CartItem({
+    book: book,
+    months: months,
+    booktitle: booktitle,
+    bookimg: bookimg,
+    price: price,
+    user: user
+  })
+
+  cartItem.save()
+    .then((data: any) => {
+      console.log(data);
+      res.send("Successfully Added Item to Cart");
+    })
+    .catch((err: Error) => {
+      console.log(err);
+    })
+
+}
+
+exports.getCartItems =  async (req: express.Request, res: express.Response) => {
+
+  CartItem.find({user: req.params.user})
+    .then((data: any) => res.send(data))
+    .catch((err: Error) => console.log(err));
+
+}
+
+exports.removeItemFromCart =  async (req: express.Request, res: express.Response) => {
+
+  const {bookid} = req.body;
+
+  CartItem.findByIdAndDelete(bookid)
+    .then((data: any) => {
+      console.log(data);
+      res.send("Successfully removed item from cart");
+    })
+    .catch((err: Error) => console.log(err));
+
+}
+
+exports.checkItemInCart =  async (req: express.Request, res: express.Response) => {
+
+  const {bookid} = req.body;
+
+  CartItem.find({
+    book: bookid,
+    user: req.params.userid
+  })
+  .then((data: any) => {
+    console.log(data)
+    console.log(bookid, req.params.userid)
+    res.send(data)
+  })
+  .catch((err: Error) => console.log(err));
+
+}
+
+exports.proceedToOrder = async (req: express.Request, res: express.Response) => {
+  
+  const {userid, shipdate, shippingaddress, orderstatus} = req.body;
+
+  CartItem.find({user: userid})
+  .then((data: any) => {
+
+    const order = new Order({
+      customerid: userid,
+      shipdate: shipdate,
+      shippingaddress: shippingaddress,
+      orderstatus: orderstatus,
+      books: data
+    })
+
+    order.save().then((data: any) => {
+      console.log(data);
+    })
+    .catch((err: Error) => res.send(err));
+
+  })
+  .catch((err: Error) => console.log(err))
+
+}

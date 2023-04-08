@@ -9,12 +9,18 @@ import MainFeaturedPost from "./MainFeaturedPost";
 import TextField from "@mui/material/TextField";
 import { styled } from "@mui/material/styles";
 import Paper from "@mui/material/Paper";
-import jwt_decode from "jwt-decode";
 import Avatar from "@mui/material/Avatar";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
 import Divider from "@mui/material/Divider";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import axios from "axios";
 import { Typography } from "@mui/material";
+import DialogTitle from "@mui/material/DialogTitle";
+import { useNavigate } from "react-router-dom";
+import InputAdornment from "@mui/material/InputAdornment";
 
 const sections = [];
 
@@ -23,7 +29,6 @@ const mainFeaturedPost = {
   description: "",
   image: "https://source.unsplash.com/random",
   imageText: "main image description",
-  linkText: "Continue reading…",
 };
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -37,17 +42,80 @@ const Item = styled(Paper)(({ theme }) => ({
 const theme = createTheme();
 
 export default function Blog() {
-  const testarr = [1, 2, 3, 4, 5];
+  const navigate = useNavigate();
 
-  let user;
+  const [file, setFile] = React.useState(null);
 
-  if (sessionStorage.getItem("googleinfo") != null) {
-    user = jwt_decode(sessionStorage.getItem("googleinfo"));
-    console.log(user);
-  } else {
-    user = JSON.parse(sessionStorage.getItem("userinfo"));
+  const [books, setBooks] = React.useState([]);
+
+  React.useEffect(() => {
+    const user = JSON.parse(sessionStorage.getItem("userinfo"));
     console.log(user.name);
-  }
+
+    axios.get(`http://localhost:4000/bookowned/${user._id}`).then((res) => {
+      console.log(res.data);
+      setBooks(res.data);
+    });
+  }, []);
+
+  const [bookinfo, setBookinfo] = React.useState({
+    title: "",
+    author: "",
+    genre: "",
+    pricing: "",
+    description: "",
+  });
+
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  let user = JSON.parse(sessionStorage.getItem("userinfo"));
+  console.log(user.name);
+
+  const handleChange = (e) => {
+    setBookinfo({ ...bookinfo, [e.target.id]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+
+    formData.append("file", file);
+    formData.append("title", bookinfo.title);
+    formData.append("author", bookinfo.author);
+    formData.append("genre", bookinfo.genre);
+    formData.append("userid", user._id);
+    formData.append("pricing", bookinfo.pricing);
+    formData.append("description", bookinfo.description);
+    try {
+      await axios({
+        method: "post",
+        url: "http://localhost:4000/book",
+        data: formData,
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+        .then((data) => {
+          console.log(formData);
+          alert("Successfully added a book");
+          setOpen(false);
+          navigate("/main");
+        })
+        .catch((err) => console.log("It is an error"));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleFileSelect = (e) => {
+    setFile(e.target.files[0]);
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -55,12 +123,11 @@ export default function Blog() {
       <Container maxWidth="lg">
         <Header title="Novel Nook" sections={sections} />
         <main>
-          <br />
           <MainFeaturedPost post={mainFeaturedPost} />
 
           <Grid container spacing={2}>
             <Grid item xs={4}>
-              <Item>
+              <Item className="profile-card">
                 <div className="profile">
                   <Box
                     sx={{
@@ -79,8 +146,6 @@ export default function Blog() {
                               sx={{ width: 100, height: 100 }}
                             />
                           </Typography>
-                          <br />
-                          <br />
                           <Typography gutterBottom variant="p" component="div">
                             Joined at:{" "}
                             {new Date(user.joined_date).toLocaleDateString()}
@@ -102,26 +167,154 @@ export default function Blog() {
                       </Typography>
                     </Box>
                     <Box sx={{ mt: 3, ml: 1, mb: 1 }}>
-                      <Button>Add a Book</Button>
+                      <Button onClick={handleClickOpen}>Add a Book</Button>
+                      <Dialog open={open} onClose={handleClose}>
+                        <DialogTitle>Upload a Book!</DialogTitle>
+                        <DialogContent>
+                          <TextField
+                            autoFocus
+                            margin="dense"
+                            id="title"
+                            label="Book Title"
+                            onChange={handleChange}
+                            type="text"
+                            value={bookinfo.title}
+                            fullWidth
+                            variant="outlined"
+                          />
+                          <TextField
+                            autoFocus
+                            margin="dense"
+                            id="pricing"
+                            label="Monthly Charge"
+                            onChange={handleChange}
+                            fullWidth
+                            value={bookinfo.pricing}
+                            type="text"
+                            variant="outlined"
+                            InputProps={{
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  ₹
+                                </InputAdornment>
+                              ),
+                            }}
+                          />
+                          <TextField
+                            autoFocus
+                            margin="dense"
+                            id="author"
+                            label="Author"
+                            onChange={handleChange}
+                            value={bookinfo.author}
+                            fullWidth
+                            type="text"
+                            variant="outlined"
+                          />
+                          <TextField
+                            autoFocus
+                            margin="dense"
+                            id="genre"
+                            label="Genre"
+                            onChange={handleChange}
+                            value={bookinfo.genre}
+                            fullWidth
+                            type="text"
+                            variant="outlined"
+                          />
+                          <br />
+                          <br />
+                          <TextField
+                            autoFocus
+                            margin="dense"
+                            id="description"
+                            value={bookinfo.description}
+                            onChange={handleChange}
+                            label="Description"
+                            type="text"
+                            multiline
+                            fullWidth
+                            variant="outlined"
+                          />
+                          <br />
+                          <br />
+
+                          <form onSubmit={handleSubmit}>
+                            {/* <Button type="file" variant="outlinedy" onChange={handleFileSelect}>Choose File</Button> */}
+                            <input type="file" onChange={handleFileSelect} />
+                            <Button
+                              type="submit"
+                              variant="outlined"
+                              value="Upload File"
+                            >
+                              UPLOAD
+                            </Button>
+                          </form>
+                        </DialogContent>
+                        <DialogActions>
+                          <Button onClick={handleClose}>Cancel</Button>
+                        </DialogActions>
+                      </Dialog>
                     </Box>
                   </Box>
                 </div>
               </Item>
             </Grid>
             <Grid item xs={8}>
-              <Item>
-                <TextField
-                  id="standard-helperText"
-                  label="Edit and save your bio profile"
-                  fullWidth
-                  variant="standard"
-                  multiline
-                />
-                <div className="button">
-                  <Button variant="outlined">SAVE</Button>
-                </div>
+              <Item className="profile-card">
+                <br />
+                <Typography variant="h4" align="left">
+                  Account Balance
+                </Typography>
+                <Divider />
+                <br />
+                <Typography variant="h6" align="left">
+                  $1200
+                </Typography>
+                <br />
+              </Item>
+              <br />
+
+              <Item className="profile-card-books">
+                <br />
+                <Typography variant="h4">
+                  {books.length === 0 ? `No Books Uploaded` : `BOOKS YOU OWN`}
+                </Typography>
+                <br />
+                {books.map((book) => (
+                  <Grid key={book._id} className="bookcard" item>
+                    <Paper
+                      sx={{
+                        height: 200,
+                        width: 150,
+                        display: "inline-block",
+                        backgroundColor: (theme) =>
+                          theme.palette.mode === "dark" ? "#1A2027" : "#fff",
+                      }}
+                      elevation={10}
+                      className="bookbox"
+                    >
+                      <img
+                        src={book.bookimage}
+                        onClick={() => {
+                          navigate(`/book/${book._id}`);
+                        }}
+                        className="book_image"
+                        alt="book"
+                      />
+                      <p className="description">
+                        {book.title} <br /> - {book.author}
+                      </p>
+                    </Paper>
+                  </Grid>
+                  
+                ))}
+                <br />
+
+                <br />
               </Item>
             </Grid>
+            <Grid item xs={8}></Grid>
           </Grid>
 
           <Grid container spacing={5} sx={{ mt: 3 }}></Grid>
@@ -129,34 +322,7 @@ export default function Blog() {
       </Container>
       <br />
       <br />
-      <Grid sx={{ flexGrow: 1 }} container spacing={7}>
-        <Grid item xs={12}>
-          {user ? (
-            <div>
-              <img src={user.picture} alt="user image" />
-              <h3>User Logged in</h3>
-              <p>Name: {user.name}</p>
-              <p>Email Address: {user.joined_date}</p>
-              <br />
-              <br />
-              <button>Log out</button>
-            </div>
-          ) : (
-            <button>Sign in with Google 🚀 </button>
-          )}
-
-          <h1>Upload Image</h1>
-
-          <form
-            action="/uploadphoto"
-            encType="multipart/form-data"
-            method="POST"
-          >
-            <input type="file" name="myimage" accept="image/*" />
-            <input type="submit" value="Upload Photo" />
-          </form>
-        </Grid>
-      </Grid>
+      <Grid sx={{ flexGrow: 1 }} container spacing={7}></Grid>
     </ThemeProvider>
   );
 }

@@ -4,7 +4,6 @@ import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import { useNavigate } from "react-router-dom";
-import { GoogleLogin } from "@react-oauth/google";
 import Link from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
@@ -13,7 +12,6 @@ import axios from "axios";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import jwt_decode from "jwt-decode";
 
 const theme = createTheme({
   typography: {
@@ -35,20 +33,6 @@ const theme = createTheme({
 export default function SignIn() {
   const navigate = useNavigate();
 
-  const responseMessage = (res) => {
-    sessionStorage.clear();
-    sessionStorage.setItem("googleinfo", res.credential);
-
-    navigate("/main");
-
-    const user = jwt_decode(sessionStorage.getItem("googleinfo"));
-    console.log(user);
-  };
-
-  const errorMessage = (err) => {
-    console.log(err);
-  };
-
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -60,7 +44,12 @@ export default function SignIn() {
       })
       .then((data) => {
         console.log(data.data);
-        navigate("/main");
+        if(data.data.adminstatus === true) {
+          navigate("/dashboard/users");  
+        } else {
+          navigate("/main");
+        }
+      
         sessionStorage.clear();
         sessionStorage.setItem("userinfo", JSON.stringify(data.data));
       })
@@ -121,10 +110,6 @@ export default function SignIn() {
                 >
                   Sign In
                 </Button>
-                <GoogleLogin
-                  onSuccess={responseMessage}
-                  onError={errorMessage}
-                />
                 <br />
                 <Grid container>
                   <Grid item xs>

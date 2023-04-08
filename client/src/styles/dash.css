@@ -1,14 +1,30 @@
 .book-image {
-    object-fit: cover;
-    height: 100%;
-    width: 100%;
+  object-fit: cover;
+  height: 100%;
+  width: 100%;
 }
 
 .footer {
-    border: 1px solid red;
+  border: 1px solid red;
 }
 
 .description {
-    color: darkslategrey;
-    font-weight: 700;
+  color: cadetblue;
+  font-weight: 700;
+}
+
+.book-card {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.book {
+  transition: all 1s ease;
+}
+
+.book:hover {
+  transition: all 0.2s ease-out;
+  box-shadow: 5px 10px #888888;
+  height: 310px;
+  width: 230px;
 }

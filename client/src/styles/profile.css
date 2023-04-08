@@ -8,10 +8,46 @@
 
 .profile-pic {
     margin: auto;
-    
+}
+
+.book_image {
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+    border-radius: 3%;
+}
+
+.bookbox:hover {
+    transition: all 0.2s ease-out;
+    box-shadow: 5px 10px #888888;
+}
+
+
+
+.profile-card {
+    box-shadow: 5px 10px 20px gray;
+}
+
+.profile-card-books {
+    padding-left: 10px;
 }
 
 .profile {
     display: inline-block;
     padding: 0% 10%;
+}
+
+.bookcard {
+    display: inline;
+    padding: 0% 3% 0% 3%;
+}
+
+.form {
+    width: 95%;
+}
+
+
+.center {
+    text-align: center;
+    align-items: center;
 }
