@@ -16,7 +16,7 @@ import Paper from "@mui/material/Paper";
 import PeopleIcon from "@mui/icons-material/People";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import LogoutIcon from '@mui/icons-material/Logout';
+import LogoutIcon from "@mui/icons-material/Logout";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
@@ -74,7 +74,6 @@ const Drawer = styled(MuiDrawer, {
 const mdTheme = createTheme();
 
 function DashboardContent() {
-
   const navigate = useNavigate();
 
   const Logout = (res) => {
@@ -118,7 +117,6 @@ function DashboardContent() {
             >
               Dashboard
             </Typography>
-            
           </Toolbar>
         </AppBar>
         <Drawer variant="permanent" open={open}>
@@ -139,19 +137,27 @@ function DashboardContent() {
             <ListItemButton>
               <ListItemText primary="Dashboard" />
             </ListItemButton>
-            <ListItemButton onClick={() => {navigate('/dashboard/users')}} >
+            <ListItemButton
+              onClick={() => {
+                navigate("/dashboard/users");
+              }}
+            >
               <ListItemIcon>
                 <PeopleIcon />
               </ListItemIcon>
               <ListItemText primary="Users" />
             </ListItemButton>
-            <ListItemButton onClick={() => {navigate('/dashboard/transactions')}} >
+            <ListItemButton
+              onClick={() => {
+                navigate("/dashboard/orders");
+              }}
+            >
               <ListItemIcon>
                 <PeopleIcon />
               </ListItemIcon>
               <ListItemText primary="Transactions/Orders" />
             </ListItemButton>
-             <ListItemButton onClick={() => Logout()} >
+            <ListItemButton onClick={() => Logout()}>
               <ListItemIcon>
                 <LogoutIcon />
               </ListItemIcon>

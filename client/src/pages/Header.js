@@ -4,7 +4,7 @@ import Toolbar from "@mui/material/Toolbar";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
-import LogoutIcon from '@mui/icons-material/Logout';
+import LogoutIcon from "@mui/icons-material/Logout";
 import Link from "@mui/material/Link";
 import Avatar from "@mui/material/Avatar";
 import { useNavigate } from "react-router-dom";
@@ -20,8 +20,8 @@ import Menu from "@mui/material/Menu";
 import axios from "axios";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import MailIcon from "@mui/icons-material/Mail";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import LocalShippingOutlinedIcon from '@mui/icons-material/LocalShippingOutlined';
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -157,6 +157,16 @@ function Header(props) {
                 <ShoppingCartIcon />
               </ListItemIcon>
               <ListItemText primary="Cart" />
+            </ListItemButton>
+            <ListItemButton
+              onClick={() => {
+                navigate(`/tracking`);
+              }}
+            >
+              <ListItemIcon>
+                <LocalShippingOutlinedIcon />
+              </ListItemIcon>
+              <ListItemText primary="Tracking" />
             </ListItemButton>
             <ListItemButton onClick={() => Logout()}>
               <ListItemIcon>

@@ -10,6 +10,7 @@ import Dashboard from '../pages/Dashboard';
 import ConfirmPurchase from '../pages/ConfirmPurchase';
 import Transactions from '../pages/Transactions';
 import Delivery from '../pages/Delivery';
+import Tracking from '../pages/Tracking'
 
 const Main = () => {
   return (
@@ -23,6 +24,7 @@ const Main = () => {
       <Route path='/dashboard/orders' element={<Transactions/>} />
       <Route path='/confirmpurchase/:bookid' element={<ConfirmPurchase/>} />
       <Route path='/delivery/:userid' element={<Delivery/>} />
+      <Route path='/tracking' element={<Tracking/>} />
     </Routes>
   );
 }

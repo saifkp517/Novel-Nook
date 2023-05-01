@@ -155,3 +155,22 @@ Content-Type: application/json
     "shippingaddress": "test",
     "orderstatus": "orderstatus"
 }
+
+###
+
+GET http://localhost:4000/delivery/6416a61c4996436b7113954e
+
+###
+
+POST http://localhost:4000/tracking
+Content-Type: application/json
+
+{
+    "userid": "6416a61c4996436b7113954e",
+    "shipdate": "12/2/2023",
+    "orderstatus": "shipped"
+}
+
+###
+
+POST http://localhost:4000/checkorder

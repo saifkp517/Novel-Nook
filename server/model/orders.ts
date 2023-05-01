@@ -7,7 +7,7 @@ const Order = new Schema({
     shipdate: String,
     shippingaddress: String,
     orderstatus: String,
-    books: [{type: Schema.Types.ObjectId, ref: "Book"}],
+    books: [{type: JSON, ref: "Book"}],
 })
 
 module.exports = mongoose.model('Order', Order)

@@ -23,7 +23,6 @@
 }
 
 
-
 .profile-card {
     box-shadow: 5px 10px 20px gray;
 }
@@ -38,7 +37,7 @@
 }
 
 .bookcard {
-    display: inline;
+    display: inline-block;
     padding: 0% 3% 0% 3%;
 }
 
@@ -50,4 +49,8 @@
 .center {
     text-align: center;
     align-items: center;
+}
+
+.orderheader {
+    text-align: left;
 }

@@ -77,7 +77,7 @@ exports.createBooks = async (req: express.Request, res: express.Response) => {
   const { title, pricing, genre, author, userid, description } = req.body;
 
   try {
-    const book = new Books({  
+    const book = new Books({
       title: title,
       author: author,
       user: userid,
@@ -178,14 +178,15 @@ exports.rentedByUpdate = async (
   function AddMonths(date: Date, months: number) {
     date.setMonth(date.getMonth() + months);
     return date;
-  }  
+  }
 
-  Books.findOneAndUpdate({ _id: bookid }, { rentedby: rentedby, time: AddMonths(new Date(), months) }).then(
-    (data: any) => {
-      console.log(data);
-      res.send("Successfully rented book");
-    }
-  );
+  Books.findOneAndUpdate(
+    { _id: bookid },
+    { rentedby: rentedby, time: AddMonths(new Date(), months) }
+  ).then((data: any) => {
+    console.log(data);
+    res.send("Successfully rented book");
+  });
 };
 
 exports.releaseBook = async (req: express.Request, res: express.Response) => {
@@ -245,8 +246,6 @@ exports.deleteNotification = async (
 
 /////////////////////////transactions///////////////////////////
 
-
-
 exports.verifySuccess = async (req: express.Request, res: express.Response) => {
   try {
     const {
@@ -301,7 +300,6 @@ exports.Orders = async (req: express.Request, res: express.Response) => {
   }
 };
 
-
 ////////////////////////////////orders////////////////////////////////////
 
 exports.createOrder = async (req: express.Request, res: express.Response) => {
@@ -322,38 +320,34 @@ exports.createOrder = async (req: express.Request, res: express.Response) => {
 };
 
 exports.getOrderById = async (req: express.Request, res: express.Response) => {
-
   Order.findById(req.params.orderid)
     .then((data: any) => res.send(data))
     .catch((err: Error) => {
       console.log(err);
       res.send("Invalid Order Id");
     });
-
-
-}
+};
 
 exports.updateOrder = async (req: express.Request, res: express.Response) => {
   const { orderid, parameter, updatedvalue } = req.body;
 
   if (parameter === "orderstatus") {
     Order.updateOne({ _id: orderid }, { orderstatus: updatedvalue })
-    .then((data: any) => res.send("successfully updated"))
-    .catch((err: Error) => console.log(err))
+      .then((data: any) => res.send("successfully updated"))
+      .catch((err: Error) => console.log(err));
   } else if (parameter === "shippingaddress") {
     Order.updateOne({ _id: orderid }, { shippingaddress: updatedvalue })
-    .then((data: any) => res.send("successfully updated"))
-    .catch((err: Error) => console.log(err))
+      .then((data: any) => res.send("successfully updated"))
+      .catch((err: Error) => console.log(err));
   } else if (parameter === "shipdate") {
     Order.updateOne({ _id: orderid }, { parameter: updatedvalue })
-    .then((data: any) => res.send("successfully updated"))
-    .catch((err: Error) => console.log(err))
+      .then((data: any) => res.send("successfully updated"))
+      .catch((err: Error) => console.log(err));
   }
 };
 
 exports.addToCart = async (req: express.Request, res: express.Response) => {
-
-  const {book, months, booktitle, price, user, bookimg} = req.body;
+  const { book, months, booktitle, price, user, bookimg, customer } = req.body;
 
   const cartItem = new CartItem({
     book: book,
@@ -361,79 +355,133 @@ exports.addToCart = async (req: express.Request, res: express.Response) => {
     booktitle: booktitle,
     bookimg: bookimg,
     price: price,
-    user: user
-  })
+    user: user,
+  });
 
-  cartItem.save()
+  cartItem
+    .save()
     .then((data: any) => {
       console.log(data);
       res.send("Successfully Added Item to Cart");
+
+      Books.findOneAndUpdate({ _id: book }, { rentedby: user }).then(
+        (data: any) => {
+          console.log(data);
+          console.log("Successfully added book");
+        }
+      );
     })
     .catch((err: Error) => {
       console.log(err);
-    })
+    });
+};
 
-}
-
-exports.getCartItems =  async (req: express.Request, res: express.Response) => {
-
-  CartItem.find({user: req.params.user})
+exports.getCartItems = async (req: express.Request, res: express.Response) => {
+  CartItem.find({ user: req.params.user })
     .then((data: any) => res.send(data))
     .catch((err: Error) => console.log(err));
+};
 
-}
-
-exports.removeItemFromCart =  async (req: express.Request, res: express.Response) => {
-
-  const {bookid} = req.body;
+exports.removeItemFromCart = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  const { bookid } = req.body;
 
   CartItem.findByIdAndDelete(bookid)
     .then((data: any) => {
       console.log(data);
       res.send("Successfully removed item from cart");
+
+      Books.findOneAndUpdate({ _id: bookid }, { rentedby: null }).then(
+        (data: any) => {
+          console.log(data);
+          console.log("Successfully added book");
+        }
+      );
     })
     .catch((err: Error) => console.log(err));
+};
 
-}
-
-exports.checkItemInCart =  async (req: express.Request, res: express.Response) => {
-
-  const {bookid} = req.body;
+exports.checkItemInCart = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  const { bookid } = req.body;
 
   CartItem.find({
     book: bookid,
-    user: req.params.userid
+    user: req.params.userid,
   })
-  .then((data: any) => {
-    console.log(data)
-    console.log(bookid, req.params.userid)
-    res.send(data)
-  })
-  .catch((err: Error) => console.log(err));
-
-}
-
-exports.proceedToOrder = async (req: express.Request, res: express.Response) => {
-  
-  const {userid, shipdate, shippingaddress, orderstatus} = req.body;
-
-  CartItem.find({user: userid})
-  .then((data: any) => {
-
-    const order = new Order({
-      customerid: userid,
-      shipdate: shipdate,
-      shippingaddress: shippingaddress,
-      orderstatus: orderstatus,
-      books: data
+    .then((data: any) => {
+      console.log(bookid, req.params.userid);
+      res.send(data);
     })
+    .catch((err: Error) => console.log(err));
+};
 
-    order.save().then((data: any) => {
-      console.log(data);
+exports.proceedToOrder = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  const { userid, shipdate, shippingaddress } = req.body;
+
+  CartItem.find({ user: userid })
+    .then((data: any) => {
+      const booklist = data.map((book: any) => ({
+        title: book.booktile,
+        image: book.bookimg,
+      }));
+
+      function AddDays(date: Date, day: number) {
+        date.setMonth(date.getDay() + day);
+        return date;
+      }
+
+      const order = new Order({
+        customerid: userid,
+        shipdate: AddDays(new Date(), 5),
+        shippingaddress: shippingaddress,
+        orderstatus: "processed",
+        books: booklist,
+      });
+
+      order
+        .save()
+        .then((data: any) => {
+          CartItem.deleteMany({ user: userid }).then(
+            res.send("Successfully placed Order")
+          );
+        })
+        .catch((err: Error) => res.send(err));
     })
-    .catch((err: Error) => res.send(err));
+    .catch((err: Error) => console.log(err));
+};
 
-  })
-  .catch((err: Error) => console.log(err))
+exports.getOrderItems = async (req: express.Request, res: express.Response) => {
+  Order.find({ customerid: req.params.userid })
+    .then((data: any) => {
+      res.send(data);
+    })
+    .catch((err: Error) => console.log(err));
+};
 
-}
+exports.getOrders = async (req: express.Request, res: express.Response) => {
+  Order.find()
+    .then((data: any) => {
+      res.send(data);
+    })
+    .catch((err: Error) => console.log(err));
+};
+
+exports.updateOrder = async (req: express.Request, res: express.Response) => {
+  const { userid, shipdate, orderstatus } = req.body;
+
+  Order.findOneAndUpdate(
+    { customerid: userid },
+    { shipdate: shipdate, orderstatus: orderstatus }
+  ).then((data: any) => {
+    console.log(data);
+    res.send("Successfully updated order");
+  });
+};

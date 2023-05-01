@@ -163,7 +163,6 @@ export default function Blog() {
       })
       .then((data) => {
         console.log(data);
-        window.location.reload(false);
       });
   };
 
@@ -185,6 +184,7 @@ export default function Blog() {
       .then((data) => {
         console.log(data);
         setOpen(true);
+        window.location.reload(false);
       })
       .catch((err) => console.log(err));
   };

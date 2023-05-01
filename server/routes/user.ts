@@ -63,6 +63,13 @@ router.post('/checkitem/:userid', Controller.checkItemInCart);
 
 router.post('/delivery', Controller.proceedToOrder);
 
+router.get('/delivery/:userid', Controller.getOrderItems);
+
+router.get('/delivery', Controller.getOrders)
+
+router.post('/tracking', Controller.updateOrder);
+
+
 
 module.exports = router;
 

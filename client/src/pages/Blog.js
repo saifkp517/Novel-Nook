@@ -28,7 +28,7 @@ const mainFeaturedPost = {
   title: "Novel Nook - Book Rental Platform",
   description:
     "Our Books lending system is a service that allows individuals to rent books with each other through an online platform. Users can search and request for specific books and the lender can approve or deny the request.",
-  image: "https://source.unsplash.com/random",
+  image: "https://source.unsplash.com/v8DSLoY80Xk",
   imageText: "main image description",
 };
 

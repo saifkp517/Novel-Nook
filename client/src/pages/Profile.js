@@ -19,6 +19,10 @@ import Button from "@mui/material/Button";
 import axios from "axios";
 import { Typography } from "@mui/material";
 import DialogTitle from "@mui/material/DialogTitle";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
 import { useNavigate } from "react-router-dom";
 import InputAdornment from "@mui/material/InputAdornment";
 
@@ -27,7 +31,7 @@ const sections = [];
 const mainFeaturedPost = {
   title: "Profile Page",
   description: "",
-  image: "https://source.unsplash.com/random",
+  image: "https://source.unsplash.com/v8DSLoY80Xk",
   imageText: "main image description",
 };
 
@@ -81,6 +85,10 @@ export default function Blog() {
 
   const handleChange = (e) => {
     setBookinfo({ ...bookinfo, [e.target.id]: e.target.value });
+  };
+
+  const setGenre = (e) => {
+    setBookinfo({ genre: e.target.value });
   };
 
   const handleSubmit = async (e) => {
@@ -211,17 +219,30 @@ export default function Blog() {
                             type="text"
                             variant="outlined"
                           />
-                          <TextField
-                            autoFocus
-                            margin="dense"
-                            id="genre"
-                            label="Genre"
-                            onChange={handleChange}
-                            value={bookinfo.genre}
-                            fullWidth
-                            type="text"
-                            variant="outlined"
-                          />
+                          <br />
+                          <br />
+                          <FormControl fullWidth>
+                            <InputLabel id="genre">Genre</InputLabel>
+                            <Select
+                              id="genre"
+                              value={bookinfo.genre}
+                              margin="dense"
+                              label="Genre"
+                              fullWidth
+                              variant="outlined"
+                              onChange={setGenre}
+                            >
+                              <MenuItem value={"Science Fiction"}>
+                                Science Fiction
+                              </MenuItem>
+                              <MenuItem value={"Mystery"}>Mystery</MenuItem>
+                              <MenuItem value={"Fiction"}>Fiction</MenuItem>
+                              <MenuItem value={"Humor"}>Humor</MenuItem>
+                              <MenuItem value={"Spirituality"}>
+                                Spirituality
+                              </MenuItem>
+                            </Select>
+                          </FormControl>
                           <br />
                           <br />
                           <TextField
@@ -297,7 +318,7 @@ export default function Blog() {
                       <img
                         src={book.bookimage}
                         onClick={() => {
-                          navigate(`/book/${book._id}`);
+                          navigate(`/confirmpurchase/${book._id}`);
                         }}
                         className="book_image"
                         alt="book"
@@ -305,9 +326,11 @@ export default function Blog() {
                       <p className="description">
                         {book.title} <br /> - {book.author}
                       </p>
+                      {book.rentedby === null ? <Button>RENTED</Button> : <Button></Button>}
                     </Paper>
+                    <br />
+                    <br />
                   </Grid>
-                  
                 ))}
                 <br />
 
